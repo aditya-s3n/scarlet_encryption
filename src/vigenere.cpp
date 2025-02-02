@@ -29,13 +29,14 @@ std::string VigenereCipher::encrypt(std::string plain_text) {
         key_index++;
 
         // if non valid character, just add to encrypted
-        if (!isalpha(plain_char)) {
+        if (!isalpha(plain_char) && !isalpha(key_char)) {
             encrypted_text += plain_char;
             continue;
         }
 
         // get the base character, upper or lower case
         char base_char = 'a';
+        key_char = tolower(key_char);
         if (isupper(plain_char)) { 
             base_char = 'A'; 
             key_char = toupper(key_char);
