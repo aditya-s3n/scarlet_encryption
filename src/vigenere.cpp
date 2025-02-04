@@ -29,7 +29,7 @@ std::string VigenereCipher::encrypt(std::string plain_text) {
         key_index++;
 
         // if non valid character, just add to encrypted
-        if (!isalpha(plain_char) && !isalpha(key_char)) {
+        if (!isalpha(plain_char) || !isalpha(key_char)) {
             encrypted_text += plain_char;
             continue;
         }
@@ -76,7 +76,7 @@ std::string VigenereCipher::decrypt(std::string encrypted_text) {
         key_index++;
 
         // if non valid character, just add to encrypted
-        if (!isalpha(encrypted_char)) {
+        if (!isalpha(encrypted_char) || !isalpha(key_char)) {
             decrypted_text += encrypted_char;
             continue;
         }
