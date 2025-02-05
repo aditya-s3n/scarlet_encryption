@@ -17,8 +17,8 @@ class VigenereCipher {
         std::string decrypt(std::string encrypted_text);
 
         // getters and setters
-        std::string get_key() { return key; }
-        void set_key(std::string new_key) { key = new_key; }
+        std::string get_key();
+        void set_key(std::string new_key);
 
 };
 

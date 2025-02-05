@@ -106,3 +106,11 @@ std::string VigenereCipher::decrypt(std::string encrypted_text) {
 
     return decrypted_text;
 }
+
+std::string VigenereCipher::get_key() {
+    return std::string();
+}
+
+void VigenereCipher::set_key(std::string new_key) {
+    key = new_key;
+}
