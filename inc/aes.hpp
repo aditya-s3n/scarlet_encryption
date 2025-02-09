@@ -8,6 +8,7 @@ class AES {
 
         uint8_t key_size;
         uint8_t round_num;
+        uint8_t key_word_size;
         uint8_t *key_original;
         uint8_t *key_schedule;
 
@@ -56,26 +57,26 @@ class AES {
         std::array<std::array<uint8_t, 4>, 4> get_state();
         void set_state(uint8_t new_state[4][4]);
 
-        // transforms
-        void s_box_transform(unsigned char &byte);
+        // transforms / helpers
+        void s_box_transform(uint8_t &byte);
+        void add_round_key(uint8_t (&state)[4][4], uint8_t *round_key);
 
         // key expansion
         void key_expansion();
-        void sub_word(unsigned char *key[4]);
-        void rot_word(unsigned char *key[4]);
-        void add_round_key(unsigned char (&state)[4][4], uint8_t *round_key);
+        void sub_word(uint8_t key[4]);
+        void rot_word(uint8_t key[4]);
 
         // cipher algorithm
         void encrypt();
-        void sub_bytes(unsigned char (&state)[4][4]);
-        void shift_rows(unsigned char (&state)[4][4]);
-        void mix_columns(unsigned char (&state)[4][4]);
+        void sub_bytes(uint8_t (&state)[4][4]);
+        void shift_rows(uint8_t (&state)[4][4]);
+        void mix_columns(uint8_t (&state)[4][4]);
         
 
         // inverse cipher algorithm
         void decrypt();
-        void inv_shift_rows(unsigned char (&state)[4][4]);
-        void inv_sub_bytes(unsigned char (&state)[4][4]);
-        void inv_mix_columns(unsigned char (&state)[4][4]);
+        void inv_shift_rows(uint8_t (&state)[4][4]);
+        void inv_sub_bytes(uint8_t (&state)[4][4]);
+        void inv_mix_columns(uint8_t (&state)[4][4]);
     
 };
