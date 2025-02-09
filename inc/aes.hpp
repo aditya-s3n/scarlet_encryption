@@ -63,8 +63,8 @@ class AES {
 
         // key expansion
         void key_expansion();
-        void sub_word(uint8_t key[4]);
-        void rot_word(uint8_t key[4]);
+        void sub_word(uint8_t (&key)[4]);
+        void rot_word(uint8_t (&key)[4]);
 
         // cipher algorithm
         void encrypt();

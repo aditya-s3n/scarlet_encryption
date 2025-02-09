@@ -124,13 +124,13 @@ void AES::key_expansion() {
     }
 }
 
-void AES::sub_word(uint8_t key[4]) {
+void AES::sub_word(uint8_t (&key)[4]) {
     for (int i = 0; i < 4; i++) {
         s_box_transform(key[i]);
     }
 }
 
-void AES::rot_word(uint8_t key[4]) {
+void AES::rot_word(uint8_t (&key)[4]) {
     uint8_t first_byte = key[0];
 
     for (int i = 0; i < 3; i++) {
