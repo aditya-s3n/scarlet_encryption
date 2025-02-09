@@ -77,8 +77,12 @@ void AES::s_box_transform(uint8_t &byte) {
     byte = s_box[row][column];
 }
 
-void AES::add_round_key(uint8_t (&state)[4][4], uint8_t round_key[4]) {
-
+void AES::add_round_key(uint8_t (&state)[4][4], uint8_t *round_key) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            state[i][j] ^= round_key[(i * 4) + j];
+        }
+    }
 }
 
 
@@ -146,12 +150,41 @@ void AES::encrypt() {
 }
 
 void AES::sub_bytes(uint8_t (&state)[4][4]) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            s_box_transform(state[i][j]);
+        }
+    }
 }
 
 void AES::shift_rows(uint8_t (&state)[4][4]) {
+    // Copy state to original_state
+    uint8_t original_state[4][4];
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            original_state[i][j] = state[i][j];
+        }
+    }
+
+    // Row 1: Shift left by 1
+    for (int i = 0; i < 4; i++) {
+        state[1][i] = original_state[1][(i + 1) % 4];
+    }
+
+    // Row 2: Shift left by 2
+    for (int i = 0; i < 4; i++) {
+        state[2][i] = original_state[2][(i + 2) % 4];
+    }
+
+    // Row 3: Shift left by 3
+    for (int i = 0; i < 4; i++) {
+        state[3][i] = original_state[3][(i + 3) % 4];
+    }
 }
 
+
 void AES::mix_columns(uint8_t (&state)[4][4]) {
+
 }
 
 
