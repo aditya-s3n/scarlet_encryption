@@ -3,8 +3,8 @@
 
 int main() {
 
-    VigenereCipher vignere = VigenereCipher("secret another secret 19000");
-    std::string s = vignere.encrypt("Scarlet 12 Scarlet 123 Scarlet Scarlet Scarlet Scarlet Scarlet Scarlet");
+    VigenereCipher vignere = VigenereCipher("secret");
+    std::string s = vignere.encrypt("Scarlet Scarlet");
     std::cout << s << std::endl;
 
     std::cout << vignere.decrypt(s) << std::endl;
