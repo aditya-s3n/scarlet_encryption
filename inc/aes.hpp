@@ -59,7 +59,7 @@ class AES {
 
         // transforms / helpers
         void s_box_transform(uint8_t &byte);
-        void add_round_key(uint8_t (&state)[4][4], uint8_t *round_key);
+        void add_round_key(uint8_t (&state)[4][4], uint8_t round_key[4]);
 
         // key expansion
         void key_expansion();
