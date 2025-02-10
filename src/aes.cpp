@@ -168,6 +168,34 @@ void AES::rot_word(uint8_t (&key)[4]) {
 
 // ciphering algorithm 
 void AES::encrypt() {
+    // add original key
+    uint8_t round_key[16]; // get the round key from the full key schedule
+    for (int i = 0; i < 16; i++) {
+        round_key[i] = key_schedule[i];
+    }
+    add_round_key(state, round_key);
+
+    // loop through the rounds, for each key made
+    for (int round = 1; round < round_num; round++) {
+        sub_bytes(state);
+        shift_rows(state);
+        mix_columns(state);
+
+        for (int i = 0; i < 16; i++) {
+            round_key[i] = key_schedule[round * 4 + i];
+        }
+        add_round_key(state, round_key);
+    }
+
+    // final round, state is now encrypted
+    sub_bytes(state);
+    shift_rows(state);
+    
+    for (int i = 0; i < 16; i++) {
+        round_key[i] = key_schedule[round_num * 4 + i];
+    }
+    add_round_key(state, round_key);
+
 }
 
 void AES::sub_bytes(uint8_t (&state)[4][4]) {
