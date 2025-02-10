@@ -21,8 +21,5 @@ int main() {
     AES aes = AES(192, key);
     aes.key_expansion();
 
-
-    delete[] key;
-
     return 0;
 }
