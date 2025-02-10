@@ -77,7 +77,14 @@ void AES::s_box_transform(uint8_t &byte) {
     byte = s_box[row][column];
 }
 
-void AES::add_round_key(uint8_t (&state)[4][4], uint8_t *round_key) {
+void AES::inv_s_box_transform(uint8_t &byte) {
+    uint8_t row = byte / 0x10;
+    uint8_t column = byte % 0x10;
+
+    byte = inv_s_box[row][column];
+}
+
+void AES::add_round_key(uint8_t (&state)[4][4], uint8_t round_key[16]) {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             state[i][j] ^= round_key[(i * 4) + j];
@@ -252,13 +259,83 @@ void AES::mix_columns(uint8_t (&state)[4][4]) {
 
 // diciphering algorithm
 void AES::decrypt() {
+    // add original key
+    uint8_t round_key[16]; // get the round key from the full key schedule
+    for (int i = 0; i < 16; i++) {
+        round_key[i] = key_schedule[round_num * 4 + i];
+    }
+    add_round_key(state, round_key);
+
+    // loop through the rounds, for each key made
+    for (int round = 1; round < round_num; round++) {
+        inv_shift_rows(state);
+        inv_sub_bytes(state);
+        
+        for (int i = 0; i < 16; i++) {
+            round_key[i] = key_schedule[round * 4 + i];
+        }
+        add_round_key(state, round_key);
+
+        inv_mix_columns(state);
+    }
+
+    // final round, state is now decrypted
+    shift_rows(state);
+    sub_bytes(state);
+    
+    for (int i = 0; i < 16; i++) {
+        round_key[i] = key_schedule[i];
+    }
+    add_round_key(state, round_key);
 }
 
 void AES::inv_shift_rows(uint8_t (&state)[4][4]) {
+    // Copy state to original_state
+    uint8_t original_state[4][4];
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            original_state[i][j] = state[i][j];
+        }
+    }
+
+    // Row 1: Shift right by 1
+    for (int i = 0; i < 4; i++) {
+        state[1][i] = original_state[1][(i - 1) % 4];
+    }
+
+    // Row 2: Shift right by 2
+    for (int i = 0; i < 4; i++) {
+        state[2][i] = original_state[2][(i - 2) % 4];
+    }
+
+    // Row 3: Shift right by 3
+    for (int i = 0; i < 4; i++) {
+        state[3][i] = original_state[3][(i - 3) % 4];
+    }
 }
 
 void AES::inv_sub_bytes(uint8_t (&state)[4][4]) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            inv_s_box_transform(state[i][j]);
+        }
+    }
 }
 
 void AES::inv_mix_columns(uint8_t (&state)[4][4]) {
+    // make a copy of the existing state
+    uint8_t temp_col[4];
+
+    // use galois matrix multiplcation to find new indicies
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            temp_col[j] = state[j][i];
+        }
+        
+        // change the state as per the algorithm formula
+        state[0][i] = galois_multi(temp_col[0], 0x0e) ^ galois_multi(temp_col[1], 0x0b) ^ galois_multi(temp_col[2], 0x0d) ^ galois_multi(temp_col[3], 0x09);
+        state[1][i] = galois_multi(temp_col[0], 0x09) ^ galois_multi(temp_col[1], 0x0e) ^ galois_multi(temp_col[2], 0x0b) ^ galois_multi(temp_col[3], 0x0d);
+        state[2][i] = galois_multi(temp_col[0], 0x0d) ^ galois_multi(temp_col[1], 0x09) ^ galois_multi(temp_col[2], 0x0e) ^ galois_multi(temp_col[3], 0x0b);
+        state[3][i] = galois_multi(temp_col[0], 0x0b) ^ galois_multi(temp_col[1], 0x0d) ^ galois_multi(temp_col[2], 0x09) ^ galois_multi(temp_col[3], 0x0e);
+    }
 }
