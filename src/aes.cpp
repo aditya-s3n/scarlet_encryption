@@ -1,6 +1,7 @@
 #include "aes.hpp"
+#include <iomanip>
 
-AES::AES(uint8_t key_size, uint8_t *key) {
+AES::AES(int key_size_in, uint8_t *key) {
     // check size of key, and update private vars
 
     // round nums
@@ -13,32 +14,32 @@ AES::AES(uint8_t key_size, uint8_t *key) {
     //  128 (4 words, 16 bytes)   --> 44 words, 176 bytes
     //  192 (6 words, 24 bytes)   --> 52 words, 208 bytes
     //  256 (8 words, 32 bytes)   --> 60 words, 240 bytes
-    if (key_size == 128) {
+    if (key_size_in == 128) {
         round_num = 10;
         key_word_size = 4;
         key_original = new uint8_t[16];
         key_schedule = new uint8_t[176];
         
         key_original = key;
-        key_size = key_size;
+        key_size = key_size_in;
 
-    } else if (key_size == 192) {
+    } else if (key_size_in == 192) {
         round_num = 12;
         key_word_size = 6;
         key_original = new uint8_t[24];
         key_schedule = new uint8_t[208];
         
         key_original = key;
-        key_size = key_size;
+        key_size = key_size_in;
 
-    } else if (key_size == 256) {
+    } else if (key_size_in == 256) {
         round_num = 14;
         key_word_size = 8;
         key_original = new uint8_t[32];
         key_schedule = new uint8_t[240];
         
         key_original = key;
-        key_size = key_size;
+        key_size = key_size_in;
 
     }
 }

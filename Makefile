@@ -14,7 +14,7 @@ EXEC = ./scarlet
 all: $(EXEC)
 
 $(EXEC): $(SOURCES)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ -g -o $@
 
 clean:
 	rm -f $(EXEC)

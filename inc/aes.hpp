@@ -6,7 +6,7 @@ class AES {
     private:
         uint8_t state[4][4];
 
-        uint8_t key_size;
+        int key_size;
         uint8_t round_num;
         uint8_t key_word_size;
         uint8_t *key_original;
@@ -67,7 +67,7 @@ class AES {
         
 
     public:
-        AES(uint8_t key_size, uint8_t *key);
+        AES(int key_size_in, uint8_t *key);
         ~AES();
 
         // state
