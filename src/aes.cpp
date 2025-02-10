@@ -85,6 +85,27 @@ void AES::add_round_key(uint8_t (&state)[4][4], uint8_t *round_key) {
     }
 }
 
+uint8_t AES::galois_multi(uint8_t byte, uint8_t multiplier) {
+    uint8_t result = 0;
+    // Loop through each bit of the multiplier
+    for (int i = 0; i < 8; i++) {
+        // If the least significant bit of the multiplier is 1, XOR with the current result
+        if (multiplier & 0x01) {
+            result ^= byte;
+        }
+
+        // Multiply by 2: left shift and apply modular reduction if overflow occurs
+        byte <<= 1;
+        if (byte & 0x100) {
+            byte ^= 0x1B;  // Apply modulo the irreducible polynomial
+        }
+
+        // Shift the multiplier to the right (process the next bit)
+        multiplier >>= 1;
+    }
+
+    return result;
+}
 
 // key expansion algorithm
 void AES::key_expansion() {
@@ -182,9 +203,22 @@ void AES::shift_rows(uint8_t (&state)[4][4]) {
     }
 }
 
-
 void AES::mix_columns(uint8_t (&state)[4][4]) {
+    // make a copy of the existing state
+    uint8_t temp_col[4];
 
+    // use galois matrix multiplcation to find new indicies
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            temp_col[j] = state[j][i];
+        }
+        
+        // change the state as per the algorithm formula
+        state[0][i] = galois_multi(temp_col[0], 0x02) ^ galois_multi(temp_col[1], 0x03) ^ temp_col[2] ^ temp_col[3];
+        state[1][i] = temp_col[0] ^ galois_multi(temp_col[1], 0x02) ^ galois_multi(temp_col[2], 0x03) ^ temp_col[3];
+        state[2][i] = temp_col[0] ^ temp_col[1] ^ galois_multi(temp_col[2], 0x02) ^ galois_multi(temp_col[3], 0x03);
+        state[3][i] = galois_multi(temp_col[0], 0x03) ^ temp_col[1] ^ temp_col[2] ^ galois_multi(temp_col[3], 0x02);
+    }
 }
 
 
