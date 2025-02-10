@@ -49,17 +49,12 @@ AES::~AES() {
     delete key_schedule;
 }
 
-
-std::array<std::array<uint8_t, 4>, 4> AES::get_state() {
-    std::array<std::array<uint8_t, 4>, 4> state_copy;
-
+void AES::get_state(uint8_t (&state_in)[4][4]) {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            state_copy[i][j] = state[i][j];  
+            state_in[i][j] = state[i][j];  
         }
     }
-
-    return state_copy;
 }
 
 void AES::set_state(uint8_t new_state[4][4]) {
@@ -86,34 +81,35 @@ void AES::inv_s_box_transform(uint8_t &byte) {
 }
 
 void AES::add_round_key(uint8_t (&state)[4][4], uint8_t round_key[16]) {
+    
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            state[i][j] ^= round_key[(i * 4) + j];
+            state[j][i] ^= round_key[(i * 4) + j];
         }
     }
 }
 
 uint8_t AES::galois_multi(uint8_t byte, uint8_t multiplier) {
     uint8_t result = 0;
-    // Loop through each bit of the multiplier
+
     for (int i = 0; i < 8; i++) {
-        // If the least significant bit of the multiplier is 1, XOR with the current result
         if (multiplier & 0x01) {
             result ^= byte;
         }
 
-        // Multiply by 2: left shift and apply modular reduction if overflow occurs
+        bool high_bit_set = byte & 0x80;
         byte <<= 1;
-        if (byte & 0x100) {
-            byte ^= 0x1B;  // Apply modulo the irreducible polynomial
+
+        if (high_bit_set) {
+            byte ^= 0x1B;
         }
 
-        // Shift the multiplier to the right (process the next bit)
         multiplier >>= 1;
     }
 
     return result;
 }
+
 
 // key expansion algorithm
 void AES::key_expansion() {
@@ -190,7 +186,7 @@ void AES::encrypt() {
         mix_columns(state);
 
         for (int i = 0; i < 16; i++) {
-            round_key[i] = key_schedule[round * 4 + i];
+            round_key[i] = key_schedule[round * 16 + i];
         }
         add_round_key(state, round_key);
     }
@@ -200,7 +196,7 @@ void AES::encrypt() {
     shift_rows(state);
     
     for (int i = 0; i < 16; i++) {
-        round_key[i] = key_schedule[round_num * 4 + i];
+        round_key[i] = key_schedule[round_num * 16 + i];
     }
     add_round_key(state, round_key);
 
@@ -263,17 +259,19 @@ void AES::decrypt() {
     // add original key
     uint8_t round_key[16]; // get the round key from the full key schedule
     for (int i = 0; i < 16; i++) {
-        round_key[i] = key_schedule[round_num * 4 + i];
+        round_key[i] = key_schedule[round_num * 16 + i];
     }
     add_round_key(state, round_key);
 
     // loop through the rounds, for each key made
-    for (int round = 1; round < round_num; round++) {
+    for (int round = round_num - 1; round >= 1; round--) {
         inv_shift_rows(state);
+
+        
         inv_sub_bytes(state);
         
         for (int i = 0; i < 16; i++) {
-            round_key[i] = key_schedule[round * 4 + i];
+            round_key[i] = key_schedule[round * 16 + i];
         }
         add_round_key(state, round_key);
 
@@ -281,8 +279,8 @@ void AES::decrypt() {
     }
 
     // final round, state is now decrypted
-    shift_rows(state);
-    sub_bytes(state);
+    inv_shift_rows(state);
+    inv_sub_bytes(state);
     
     for (int i = 0; i < 16; i++) {
         round_key[i] = key_schedule[i];
@@ -301,17 +299,17 @@ void AES::inv_shift_rows(uint8_t (&state)[4][4]) {
 
     // Row 1: Shift right by 1
     for (int i = 0; i < 4; i++) {
-        state[1][i] = original_state[1][(i - 1) % 4];
+        state[1][i] = original_state[1][(i - 1 + 4) % 4];
     }
 
     // Row 2: Shift right by 2
     for (int i = 0; i < 4; i++) {
-        state[2][i] = original_state[2][(i - 2) % 4];
+        state[2][i] = original_state[2][(i - 2 + 4) % 4];
     }
 
     // Row 3: Shift right by 3
     for (int i = 0; i < 4; i++) {
-        state[3][i] = original_state[3][(i - 3) % 4];
+        state[3][i] = original_state[3][(i - 3 + 4) % 4];
     }
 }
 

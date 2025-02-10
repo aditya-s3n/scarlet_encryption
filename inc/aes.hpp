@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstdint>
-#include <array>
 
 class AES {
     private:
@@ -71,7 +70,7 @@ class AES {
         ~AES();
 
         // state
-        std::array<std::array<uint8_t, 4>, 4> get_state();
+        void get_state(uint8_t (&state_in)[4][4]);
         void set_state(uint8_t new_state[4][4]);
 
         // transforms / helpers
