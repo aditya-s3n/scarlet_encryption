@@ -73,12 +73,6 @@ class AES {
         void get_state(uint8_t (&state_in)[4][4]);
         void set_state(uint8_t new_state[4][4]);
 
-        // transforms / helpers
-        void s_box_transform(uint8_t &byte);
-        void inv_s_box_transform(uint8_t &byte);
-        void add_round_key(uint8_t (&state)[4][4], uint8_t round_key[16]);
-        uint8_t galois_multi(uint8_t byte, uint8_t multiplier);
-
         // key expansion
         void key_expansion();
         void sub_word(uint8_t (&key)[4]);
@@ -96,5 +90,11 @@ class AES {
         void inv_shift_rows(uint8_t (&state)[4][4]);
         void inv_sub_bytes(uint8_t (&state)[4][4]);
         void inv_mix_columns(uint8_t (&state)[4][4]);
+
+        // transforms / helpers
+        void s_box_transform(uint8_t &byte);
+        void inv_s_box_transform(uint8_t &byte);
+        void add_round_key(uint8_t (&state)[4][4], uint8_t round_key[16]);
+        uint8_t galois_multi(uint8_t byte, uint8_t multiplier);
     
 };

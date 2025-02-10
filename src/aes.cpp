@@ -81,7 +81,6 @@ void AES::inv_s_box_transform(uint8_t &byte) {
 }
 
 void AES::add_round_key(uint8_t (&state)[4][4], uint8_t round_key[16]) {
-    
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             state[j][i] ^= round_key[(i * 4) + j];
