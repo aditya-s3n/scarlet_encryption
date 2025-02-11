@@ -1,5 +1,4 @@
 #include "aes.hpp"
-#include <iomanip>
 
 AES::AES(int key_size_in, uint8_t *key) {
     // check size of key, and update private vars
