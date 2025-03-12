@@ -252,7 +252,7 @@ void AES::mix_columns(uint8_t (&state)[4][4]) {
 }
 
 
-// diciphering algorithm
+// deciphering algorithm
 void AES::decrypt() {
     // add original key
     uint8_t round_key[16]; // get the round key from the full key schedule
