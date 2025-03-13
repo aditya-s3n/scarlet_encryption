@@ -3,7 +3,6 @@
 
 class SHA512 {
     private:
-        std::string filename;
         uint64_t message_block[16];
 
         // set the inital hash value
@@ -40,12 +39,11 @@ class SHA512 {
 
 
     public:
-        SHA512(std::string filename);
+        SHA512(uint64_t message_block[16]);
         ~SHA512();
 
         // preprocessing
         void preprocessing();
-        void open_file();
 
         // hash computation
         void hash_computation();
@@ -57,13 +55,10 @@ class SHA512 {
         uint64_t message_sigma_1(uint64_t x);
         uint64_t compression_sigma_0(uint64_t x);
         uint64_t compression_sigma_1(uint64_t x);
-        
-
 
         // getters
         uint64_t* get_hash();
         uint64_t* get_message();
-
 
 
 };
