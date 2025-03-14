@@ -14,13 +14,60 @@ void SHA512::preprocessing() {
 }
 
 void SHA512::hash_computation() {
-    // Function implementation
-    
-    
+    /** 
+     * NOTE, no need to count for overflow since uint64 wraps around via hardware level behaviour
+     */
+
+    uint64_t word_blocks[80];
+    // iterate 80 times
+    for (int i = 0; i < 80; i++) {
+        // prepare the message
+        uint64_t word;
+        if (i < 16) {
+            word_blocks[i] = message_block[i];
+        } else {
+            word_blocks[i] = message_sigma_1(word_blocks[i - 2]) 
+                            + word_blocks[i - 7] 
+                            + message_sigma_1(word_blocks[i - 15]) 
+                            + word_blocks[i - 16];
+        }
+
+        // assign temp variables
+        uint64_t a = hash_val[0];
+        uint64_t b = hash_val[1];
+        uint64_t c = hash_val[2];
+        uint64_t d = hash_val[3];
+        uint64_t e = hash_val[4];
+        uint64_t f = hash_val[5];
+        uint64_t g = hash_val[6];
+        uint64_t h = hash_val[7];
+
+        // do math computation / new temp values
+        uint64_t T1 = h + compression_sigma_1(e) + ch(e, f, g) + K_CONSTANTS[i] + word_blocks[i];
+        uint64_t T2 = compression_sigma_0(a) + maj(a, b, c);
+        h = g;
+        g = f;
+        f = e;
+        e = d + T1;
+        d = c;
+        c = b;
+        b = a;
+        a = T1 + T2;
+
+        // assign to new values
+        hash_val[0] += a;
+        hash_val[1] += b;
+        hash_val[2] += c;
+        hash_val[3] += d;
+        hash_val[4] += e;
+        hash_val[5] += f;
+        hash_val[6] += g;
+        hash_val[7] += h;
+    }
 }
 
 uint64_t SHA512::ch(uint64_t x, uint64_t y, uint64_t z) {
-    return (x & y) ^ (!x & z);
+    return (x & y) ^ (~x & z);
 }
 
 uint64_t SHA512::maj(uint64_t x, uint64_t y, uint64_t z) {
